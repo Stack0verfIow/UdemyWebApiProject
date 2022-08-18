@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace UdemyWebApiProject.Controllers
 {
     [ApiController]
-    public class BaseController : ControllerBase
+    [Route("[controller]")]
+    public class BaseApiController : ControllerBase
     {
     }
 }

@@ -1,46 +1,35 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UdemyWebApiProject.Data;
 using UdemyWebApiProject.Entities;
-using UdemyWebApiProject.Interfaces;
 
 namespace UdemyWebApiProject.Controllers
 {
-    [Route("[controller]")]
-    public class AppUserController : BaseController
+    public class AppUserController : BaseApiController
     {
-        private readonly IAppUserRepository _repository;
-        public AppUserController(IAppUserRepository repository)
+        private readonly DataContext _context;
+
+        public AppUserController(DataContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> Get([FromRoute]int id, CancellationToken ct)
         {
-            var reponse = await _repository.Get(x => x.Id == id, ct);
+            var reponse = await _context.AppUser.FirstOrDefaultAsync(x => x.Id == id, ct);
             return Ok(reponse);
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            var reponse = await _repository.GetAll(ct);
+            var reponse = await _context.AppUser.ToListAsync(ct);
             return Ok(reponse);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody]AppUser appUser, CancellationToken ct)
-        {
-            var reponse = await _repository.Create(appUser, ct);
-            return Created("Create", reponse);
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody]AppUser appUser, CancellationToken ct)
-        {
-            var response = await _repository.Update(appUser, ct);
-            return Ok(response);
         }
 
     }

@@ -2,7 +2,8 @@
 
 namespace UdemyWebApiProject.Interfaces
 {
-    public interface IAppUserRepository: IRepository<AppUser>
+    public interface ITokenService
     {
+        string CreateToken(AppUser appUser);
     }
 }
