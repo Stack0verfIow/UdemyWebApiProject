@@ -1,21 +1,21 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using UdemyWebApiProject.Data;
+using UdemyWebApiProject.Extensions;
 using UdemyWebApiProject.Interfaces;
-using UdemyWebApiProject.Repositories;
+using UdemyWebApiProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddCors();
 
-builder.Services.AddDbContext<DataContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-    options.UseSqlServer(connectionString);
-});
-
-builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServiceExtensions(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -32,6 +32,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
